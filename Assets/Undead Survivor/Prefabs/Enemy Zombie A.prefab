@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5541255436026515468}
   - component: {fileID: 4627266274161071486}
   - component: {fileID: 7915490442281430486}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Enemy Zombie A
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -214,7 +214,7 @@ GameObject:
   m_Component:
   - component: {fileID: 268098956222258275}
   - component: {fileID: 2734720760200830296}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

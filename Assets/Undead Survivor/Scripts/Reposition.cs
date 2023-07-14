@@ -13,12 +13,13 @@ public class Reposition : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D collision)
     {
+        // Area가 벗어난 경우에만 실행하기 위해
         if(!collision.CompareTag("Area"))
         {
             return;
         }
 
-        Vector3 playerPos = GameManager.Instance.player.transform.position;
+        Vector3 playerPos = GameManager.instance.player.transform.position;
         Vector3 myPos = transform.position;
 
         switch (transform.tag)

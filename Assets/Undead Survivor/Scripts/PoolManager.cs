@@ -18,7 +18,6 @@ public class PoolManager : MonoBehaviour
         {
             pools[index] = new List<GameObject> ();
         }
-            
     }
 
     public GameObject Get(int index)
