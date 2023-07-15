@@ -16,12 +16,7 @@ public class Weapon : MonoBehaviour
 
     void Awake()
     {
-        player = GetComponentInParent<Player>();
-    }
-
-    void Start()
-    {
-        Init();
+        player = GameManager.instance.player;
     }
 
     void Update()
@@ -53,23 +48,47 @@ public class Weapon : MonoBehaviour
         {
             Batch();
         }
+
+        player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver);
     }
 
-    public void Init()
+    public void Init(ItemData data)
     {
+        // Basic
+        name = "Weapon " + data.itemId;
+        transform.parent = player.transform;
+        transform.localPosition = Vector3.zero;
+
+        // Property Set
+        id = data.itemId;
+        damage = data.baseDamage;
+        count = data.baseCount;
+
+        for(int index = 0; index < GameManager.instance.pool.prefabs.Length; index++)
+        {
+            if(data.projectile == GameManager.instance.pool.prefabs[index])
+            {
+                prefabId = index;
+                break;
+            }
+        }
+
         switch (id)
         {
             case 0:
                 // 음수일 때 반시계 방향으로 회전, 양수일 때 시계 방향 회전
-                speed = 250;
+                speed = 200f;
                 // 속성 부여
                 Batch();        
                 break;
             default:
                 // 원거리 공격 시 speed가 낮을수록 빠르게 발사
-                speed = 0.5f;
+                speed = 1f;
                 break;
         }
+
+        // 특정 함수 호출을 모든 자식 오브젝트에게 지시하는 함수. 두 번째 인자로 옵션을 추가(없으면 실행 하지마라)
+        player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver);
     }
 
     void Batch()

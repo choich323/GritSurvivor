@@ -18,12 +18,19 @@ public class GameManager : MonoBehaviour
     public int level;
     public int kill;
     public int exp;
-    ExpManager expManager;
+    public ExpManager expManager;
+    public int health;
+    public int maxHealth;
 
     void Awake()
     {
         instance = this;
         expManager = GetComponent<ExpManager>();
+    }
+
+    void Start()
+    {
+        health = maxHealth;
     }
 
     void Update()
