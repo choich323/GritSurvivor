@@ -21,6 +21,9 @@ public class Weapon : MonoBehaviour
 
     void Update()
     {
+        if (!GameManager.instance.isLive)
+            return;
+
         switch (id)
         {
             case 0:
@@ -54,6 +57,7 @@ public class Weapon : MonoBehaviour
 
     public void Init(ItemData data)
     {
+        // Weapon Type에 따른 이름과 스테이터스 결정
         // Basic
         name = "Weapon " + data.itemId;
         transform.parent = player.transform;
@@ -86,6 +90,11 @@ public class Weapon : MonoBehaviour
                 speed = 1f;
                 break;
         }
+
+        // Hand Set
+        Hand hand = player.hands[(int)data.itemType];
+        hand.spriter.sprite = data.hand;
+        hand.gameObject.SetActive(true);
 
         // 특정 함수 호출을 모든 자식 오브젝트에게 지시하는 함수. 두 번째 인자로 옵션을 추가(없으면 실행 하지마라)
         player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver);
