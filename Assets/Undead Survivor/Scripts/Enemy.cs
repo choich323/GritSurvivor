@@ -88,6 +88,7 @@ public class Enemy : MonoBehaviour
         {
             // Hit action
             anim.SetTrigger("Hit");
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.Hit);
         }
         else
         {
@@ -97,9 +98,13 @@ public class Enemy : MonoBehaviour
             rigid.simulated = false;
             spriter.sortingOrder--;
             anim.SetBool("Dead", true);
-            GameManager.instance.kill++;
-            GameManager.instance.GetExp();
 
+            if (GameManager.instance.isLive)
+            {
+                AudioManager.instance.PlaySfx(AudioManager.Sfx.Dead);
+                GameManager.instance.kill++;
+                GameManager.instance.GetExp();
+            }
         }
     }
 

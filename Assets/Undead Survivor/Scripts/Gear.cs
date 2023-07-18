@@ -49,12 +49,15 @@ public class Gear : MonoBehaviour
         foreach(Weapon weapon in weapons)
         {
             switch (weapon.id)
-            {
+            {   
                 case 0:
-                    weapon.speed = 200 + (200 * rate);
+                    // 기본 공격속도 * 캐릭터 보너스
+                    float speed = 200f * Character.WeaponSpeed;
+                    weapon.speed = speed + (speed * rate);
                     break;
                 default:
-                    weapon.speed = 1f * (1f - rate);
+                    speed = 1f * Character.WeaponRate;
+                    weapon.speed = speed * (1f - rate);
                     break;
             }
         }
@@ -62,7 +65,8 @@ public class Gear : MonoBehaviour
 
     void SpeedUp()
     {
-        float speed = 4; // 기본 이동속도
+        // 기본 이동속도 * 캐릭터 보너스
+        float speed = 4 * Character.Speed;
         GameManager.instance.player.speed = speed + speed * rate;
     }
 }

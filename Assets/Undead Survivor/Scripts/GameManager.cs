@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public LevelUp uiLevelUp;
     public Result uiGameOver;
     public GameObject enemyCleaner;
+    public Transform uiJoy;
 
     [Header("# Game Control")]
     public float gameTime;
@@ -20,6 +21,7 @@ public class GameManager : MonoBehaviour
     public bool isLive;
 
     [Header("# Player Info")]
+    public int playerId;
     public int level;
     public int kill;
     public int exp;
@@ -30,15 +32,23 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         instance = this;
+        // 타겟 최대 프레임 설정(PC에서는 더 높은 프레임이 나올 수 있으나, 모바일에서는 60이 최대)
+        Application.targetFrameRate = 60;
         expManager = GetComponent<ExpManager>();
         Stop();
     }
 
-    public void GameStart()
+    public void GameStart(int id)
     {
+        playerId = id;
         health = maxHealth;
-        uiLevelUp.Select(0);
+
+        player.gameObject.SetActive(true);
+        uiLevelUp.Select(playerId % 2);
         Resume();
+
+        AudioManager.instance.PlayBgm(true);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Select);
     }
 
     public void GameOver()
@@ -55,6 +65,9 @@ public class GameManager : MonoBehaviour
         uiGameOver.gameObject.SetActive(true);
         uiGameOver.Lose();
         Stop();
+
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Lose);
+        AudioManager.instance.PlayBgm(false);
     }
 
     public void GameVictory()
@@ -73,11 +86,19 @@ public class GameManager : MonoBehaviour
         uiGameOver.gameObject.SetActive(true);
         uiGameOver.Win();
         Stop();
+
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Win);
+        AudioManager.instance.PlayBgm(false);
     }
 
     public void GameRetry()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void GameQuit()
+    {
+        Application.Quit();
     }
 
     void Update()
@@ -111,6 +132,7 @@ public class GameManager : MonoBehaviour
     {
         isLive = false;
         Time.timeScale = 0;
+        uiJoy.localScale = Vector3.zero;
     }
 
     public void Resume()
@@ -118,5 +140,6 @@ public class GameManager : MonoBehaviour
         isLive = true;
         // timescale이 증가하면 그만큼 진행속도가 빨라진다
         Time.timeScale = 1;
+        uiJoy.localScale = Vector3.one;
     }
 }

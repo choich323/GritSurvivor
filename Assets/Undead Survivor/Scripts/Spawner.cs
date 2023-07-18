@@ -11,7 +11,7 @@ public class Spawner : MonoBehaviour
     public float levelTime;
 
     int level = 0;
-    float timer = 0;
+    float timer = 10f;
 
     void Awake()
     {

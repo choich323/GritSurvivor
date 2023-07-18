@@ -16,11 +16,14 @@ public class LevelUp : MonoBehaviour
     public void Show()
     {
         Next();
-        
         // UI 보여주기
         rect.localScale = Vector3.one;
-
         GameManager.instance.Stop();
+
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
+        // UI가 나타났을 때 배경음악을 필터링
+        // 이 경우 이펙트 소리까지 필터링 될 수 있으므로 오디오 매니저에서 예외처리
+        AudioManager.instance.EffectBgm(true);
     }
 
     public void Hide()
@@ -29,6 +32,9 @@ public class LevelUp : MonoBehaviour
         rect.localScale = Vector3.zero;
 
         GameManager.instance.Resume();
+
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Select);
+        AudioManager.instance.EffectBgm(false);
     }
 
     public void Select(int index)

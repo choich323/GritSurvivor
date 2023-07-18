@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 
     public Scanner scanner;
     public Hand[] hands;
+    public RuntimeAnimatorController[] animCon;
 
     Rigidbody2D rigid;
     SpriteRenderer spriter;
@@ -23,6 +24,13 @@ public class Player : MonoBehaviour
         spriter = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         hands = GetComponentsInChildren<Hand>(true); // 인자값으로 true를 넣으면 활성화되지 않은 오브젝트도 초기화한다.
+    }
+
+    void OnEnable()
+    {
+        // 기본 이동속도 * 캐릭터 보너스
+        speed *= Character.Speed;
+        anim.runtimeAnimatorController = animCon[GameManager.instance.playerId];
     }
 
     void FixedUpdate()
