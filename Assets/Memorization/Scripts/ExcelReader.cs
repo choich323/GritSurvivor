@@ -4,20 +4,20 @@ using UnityEngine;
 using System.IO;
 using ExcelDataReader;
 using UnityEngine.UI;
-using System.Linq;
-using UnityEngine.UIElements;
-using UnityEngine.SceneManagement;
-using UnityEditor;
 
 public class ExcelReader : MonoBehaviour
 {
     // 로드할 파일
-    string wordFile = @"E:\Programming_Practice\Unity\UndeadSurvivor\UndeadSurvivor\Assets\VOCA (Excel).xlsx";
-    
+    string wordFile = "Assets\\VOCA (Excel).xlsx";
+
+    int pageIndex = 0;
+
     // 행 데이터 저장할 프리펩 담기
     public RectTransform[] uiLines;
 
-    public void DataLoad()
+    System.Data.DataSet cellData;
+
+    public void Init()
     {
         // 단어 암기 챕터 범위(텍스트)
         string textFront = MemorizationManager.instance.ifFront.text;
@@ -32,6 +32,7 @@ public class ExcelReader : MonoBehaviour
         // 끝 챕터가 빈칸인 경우 자동으로 200으로 설정
         if(textBack == "")
         {
+            MemorizationManager.instance.ifBack.text = "200";
             textBack = "200";
         }
 
@@ -51,29 +52,43 @@ public class ExcelReader : MonoBehaviour
         {   // 파일 읽기
             using (var reader = ExcelReaderFactory.CreateReader(stream))
             {   // 데이터셋 구성
-                var result = reader.AsDataSet();
-                // 행 구분 인덱스: 선택한 챕터부터 시작
-                int index = 0 + (textFrontNum - 1) * 30;
-                foreach (RectTransform line in uiLines)
-                {
-                    // 라인 별로 텍스트 데이터 로드
-                    Text[] childrens = line.GetComponentsInChildren<Text>();
-                    // 텍스트 컴포넌트에 테이블 데이터 넣기
-                    foreach (Text child in childrens)
-                    {
-                        if (child.name == "Text Word")
-                        {
-                            child.text = result.Tables[0].Rows[index++][1].ToString();
-                            break;
-                        }
-                    }
-                    // 입력란 데이터 초기화
-                    InputField inputData = line.GetComponentInChildren<InputField>();
-                    inputData.text = "";
-                }
+                cellData = reader.AsDataSet();
+
+                // 페이지 넘버 초기화
+                MemorizationManager.instance.textPageNumber.text = string.Format("{0}", textFront);
+
+                PageLoad(textFrontNum, 0);
             }
         }
         // UI 전환
         MemorizationManager.instance.EnterMemorization();
+    }
+
+    // 페이지 데이터 갱신
+    public void PageLoad(int textFrontNum, int add)
+    {
+        // 1. 단어 갱신
+        // 행 구분 인덱스: 선택한 챕터부터 시작
+        pageIndex = (textFrontNum + add - 1) * 30;
+        foreach (RectTransform line in uiLines)
+        {
+            // 라인 별로 텍스트 데이터(영단어 부분) 로드
+            Text[] childrens = line.GetComponentsInChildren<Text>();
+            // 텍스트 컴포넌트에 테이블 데이터 넣기
+            foreach (Text child in childrens)
+            {
+                if (child.name == "Text Word")
+                {
+                    child.text = cellData.Tables[0].Rows[pageIndex++][1].ToString();
+                    break;
+                }
+            }
+            // 2. 인풋 필드 초기화
+            InputField inputData = line.GetComponentInChildren<InputField>();
+            inputData.text = "";
+        }
+        // 3. 페이지 넘버 갱신
+        MemorizationManager.instance.textPageNumber.text = string.Format("{0}", (textFrontNum + add).ToString());
+
     }
 }
