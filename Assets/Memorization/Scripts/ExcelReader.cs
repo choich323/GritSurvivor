@@ -72,23 +72,35 @@ public class ExcelReader : MonoBehaviour
         pageIndex = (textFrontNum + add - 1) * 30;
         foreach (RectTransform line in uiLines)
         {
-            // 라인 별로 텍스트 데이터(영단어 부분) 로드
-            Text[] childrens = line.GetComponentsInChildren<Text>();
-            // 텍스트 컴포넌트에 테이블 데이터 넣기
-            foreach (Text child in childrens)
+            // 영단어 데이터 로드
+            Text word = line.GetChild(1).GetComponent<Text>();
+            word.text = cellData.Tables[0].Rows[pageIndex][1].ToString();
+
+            // 단어 뜻 데이터 로드
+            Text textAnswer = line.GetChild(3).GetChild(2).GetComponent<Text>();
+            textAnswer.text = cellData.Tables[0].Rows[pageIndex][2].ToString();
+
+            // 답이 공개되어 있는 경우 가리기
+            Toggle toggleAnswerCheck = line.GetChild(3).GetComponent<Toggle>();
+            if (toggleAnswerCheck.isOn)
             {
-                if (child.name == "Text Word")
-                {
-                    child.text = cellData.Tables[0].Rows[pageIndex++][1].ToString();
-                    break;
-                }
+                toggleAnswerCheck.isOn = false;
             }
+
+            // 다음 단어로
+            pageIndex++;
+
             // 2. 인풋 필드 초기화
-            InputField inputData = line.GetComponentInChildren<InputField>();
+            InputField inputData = line.GetChild(2).GetComponent<InputField>();
             inputData.text = "";
         }
+        // 전체 답 공개 상태면 끄기
+        if (MemorizationManager.instance.toggleAnswerCheckAll.isOn)
+        {
+            MemorizationManager.instance.toggleAnswerCheckAll.isOn = false;
+        }
+
         // 3. 페이지 넘버 갱신
         MemorizationManager.instance.textPageNumber.text = string.Format("{0}", (textFrontNum + add).ToString());
-
     }
 }

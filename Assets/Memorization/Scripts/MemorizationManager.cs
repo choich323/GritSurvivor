@@ -11,21 +11,23 @@ public class MemorizationManager : MonoBehaviour
 
     // btn~ : 버튼, if: 인풋 필드
 
-    [Header ("# Select UI")]
+    [Header("# Select UI")]
     public GameObject scrollViewWordGroup;
     public GameObject uiSelect;
     public GameObject uiWarningText;
     public InputField ifFront;
     public InputField ifBack;
 
-    [Header ("# Memorization UI")]
+    [Header("# Memorization UI")]
     public GameObject btnReturnSelect;
     public GameObject btnLeft;
     public GameObject btnRight;
     public Text textPageNumber;
+    public Toggle toggleAnswerCheckAll;
 
     // 페이지 변동값 기록
     int add = 0;
+    int lineIndex = 0;
 
     void Awake()
     {
@@ -104,5 +106,26 @@ public class MemorizationManager : MonoBehaviour
             btnLeft.SetActive(true);
             btnRight.SetActive(true);
         }
+    }
+
+    public void AnswerOpenAll(Toggle toggle)
+    {
+        foreach (RectTransform line in excelReader.uiLines)
+        {
+            line.GetChild(3).GetChild(1).gameObject.SetActive(!toggle.isOn); // toggle의 터치 안내 텍스트
+            line.GetChild(3).GetChild(2).gameObject.SetActive(toggle.isOn);  // toggle의 정답 텍스트
+        }
+    }
+
+    public void AnswerIndex(int index)
+    {
+        lineIndex = index;   
+    }
+
+    public void AnswerOpen(Toggle toggle)
+    {
+        // 인덱스를 통해 몇번째 라인인지 체크하고 해당 라인에 대해서만 변화를 적용
+        excelReader.uiLines[lineIndex].GetChild(3).GetChild(1).gameObject.SetActive(!toggle.isOn);
+        excelReader.uiLines[lineIndex].GetChild(3).GetChild(2).gameObject.SetActive(toggle.isOn);
     }
 }
