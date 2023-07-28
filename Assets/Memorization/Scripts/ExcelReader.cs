@@ -55,7 +55,7 @@ public class ExcelReader : MonoBehaviour
                 cellData = reader.AsDataSet();
 
                 // 페이지 넘버 초기화
-                MemorizationManager.instance.textPageNumber.text = string.Format("{0}", textFront);
+                MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", textFront);
 
                 PageLoad(textFrontNum, 0);
             }
@@ -101,6 +101,6 @@ public class ExcelReader : MonoBehaviour
         }
 
         // 3. 페이지 넘버 갱신
-        MemorizationManager.instance.textPageNumber.text = string.Format("{0}", (textFrontNum + add).ToString());
+        MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", (textFrontNum + add).ToString());
     }
 }

@@ -22,12 +22,18 @@ public class MemorizationManager : MonoBehaviour
     public GameObject btnReturnSelect;
     public GameObject btnLeft;
     public GameObject btnRight;
-    public Text textPageNumber;
+    public Text uiPageNumber;
     public Toggle toggleAnswerCheckAll;
+
+    [Header("# Warning UI")]
+    public GameObject uiWarning;
+    public GameObject uiPageMoveWarning;
+    public GameObject uiReturnSelectWarning;
 
     // 페이지 변동값 기록
     int add = 0;
     int lineIndex = 0;
+    bool isRight;
 
     void Awake()
     {
@@ -64,10 +70,12 @@ public class MemorizationManager : MonoBehaviour
         ifBack.text = "";
         // 누적값 초기화
         add = 0;
-        // 선택창 켜기, 선택창 돌아가기 버튼/스크롤 뷰 끄기
+        // 선택창 켜기, 선택창 돌아가기 버튼/스크롤 뷰, 경고창 끄기
         uiSelect.SetActive(true);
         btnReturnSelect.SetActive(false);
         scrollViewWordGroup.SetActive(false);
+        uiWarning.SetActive(false);
+        uiReturnSelectWarning.SetActive(false);
     }
 
     // 메인 모드로 돌아가기
@@ -76,9 +84,13 @@ public class MemorizationManager : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
-    public void PageChange(bool isRight)
+    public void PageChange()
     {
         int textFrontNum = int.Parse(ifFront.text);
+
+        // 경고창 끄기
+        uiWarning.SetActive(false);
+        uiPageMoveWarning.SetActive(false);
 
         // 오른쪽 버튼이면
         if (isRight)
@@ -108,7 +120,7 @@ public class MemorizationManager : MonoBehaviour
         }
     }
 
-    public void AnswerOpenAll(Toggle toggle)
+    public void OpenAllAnswer(Toggle toggle)
     {
         foreach (RectTransform line in excelReader.uiLines)
         {
@@ -117,15 +129,49 @@ public class MemorizationManager : MonoBehaviour
         }
     }
 
+    // N 번째 라인에 대하여 N의 값을 구하는 함수
     public void AnswerIndex(int index)
     {
         lineIndex = index;   
     }
 
-    public void AnswerOpen(Toggle toggle)
+    public void OpenAnswer(Toggle toggle)
     {
         // 인덱스를 통해 몇번째 라인인지 체크하고 해당 라인에 대해서만 변화를 적용
         excelReader.uiLines[lineIndex].GetChild(3).GetChild(1).gameObject.SetActive(!toggle.isOn);
         excelReader.uiLines[lineIndex].GetChild(3).GetChild(2).gameObject.SetActive(toggle.isOn);
+    }
+
+    public void ShowWarning(bool isReturn)
+    {
+        uiWarning.SetActive(true);
+        if(isReturn)
+        {
+            uiReturnSelectWarning.SetActive(true);
+        }
+        else
+        {
+            uiPageMoveWarning.SetActive(true);
+        }
+    }
+
+    // 취소 버튼
+    public void Cancel(bool isReturn)
+    {
+        uiWarning.SetActive(false);
+        if (isReturn)
+        {
+            uiReturnSelectWarning.SetActive(false);
+        }
+        else
+        {
+            uiPageMoveWarning.SetActive(false);
+        }
+    }
+
+    // 페이지 이동시 다음 페이지인지 이전 페이지인지 구분하기 위한 인덱스를 로드
+     public void DirCheck(bool isRight)
+    {
+        this.isRight = isRight;
     }
 }
