@@ -39,6 +39,8 @@ public class MemorizationManager : MonoBehaviour
     {
         instance = this;
         excelReader = GetComponent<ExcelReader>();
+        // 유저의 아이디를 제대로 식별하는지 확인(임시 코드)
+        Debug.Log(ServerManager.instance.userID.text);
     }
 
     // 범위 선택 UI -> 암기 UI

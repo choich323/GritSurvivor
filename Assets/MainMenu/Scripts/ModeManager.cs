@@ -10,7 +10,7 @@ public class ModeManager : MonoBehaviour
         SceneManager.LoadScene("UndeadSurvivor");
     }
 
-    public void EnterMomorizationMode()
+    public void EnterMemorizationMode()
     {
         SceneManager.LoadScene("Memorization");
     }
