@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9ee30eb7d2f1f404790266ee96a67099
+guid: 1bc6097228993f045852159e71f81d5b
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -77,6 +77,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -89,6 +90,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -101,6 +103,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -113,6 +116,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -125,13 +129,27 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Tile 0
+      name: Run 0
       rect:
         serializedVersion: 2
         x: 0
@@ -145,14 +163,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d9f812108496e0d4da2fe09a2360c314
-      internalID: 2093186594
+      spriteID: fdc04699b3a4745499a7130a1b370a7e
+      internalID: 613658156
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tile 1
+      name: Run 1
       rect:
         serializedVersion: 2
         x: 19
@@ -166,14 +184,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: aa519104451eb2b4fa72798f5712fe93
-      internalID: -2031541144
+      spriteID: d472efc56b7bb3548872a39a571057b8
+      internalID: -140220566
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tile 2
+      name: Run 2
       rect:
         serializedVersion: 2
         x: 38
@@ -187,14 +205,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c275ace70e8c1e642944a4e5f47b1f52
-      internalID: 693853673
+      spriteID: f07178bf1ddce4f4bbaa4a108f29c115
+      internalID: 1611109861
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tile 3
+      name: Run 3
       rect:
         serializedVersion: 2
         x: 0
@@ -208,14 +226,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 801a3a7999d0d7347b4ee52cbce915d1
-      internalID: 179664457
+      spriteID: 5b4878b1cf6f4294b9cf45768ab819db
+      internalID: 1488126946
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tile 4
+      name: Hit
       rect:
         serializedVersion: 2
         x: 19
@@ -229,14 +247,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 499b9b258a33b704fa976966c6b6b3bd
-      internalID: 1830541467
+      spriteID: b2106da71adc09543b649e5e5d6505f9
+      internalID: -392852972
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tile 5
+      name: Dead
       rect:
         serializedVersion: 2
         x: 38
@@ -250,8 +268,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 021a06fb2ea20024587725277c4e262c
-      internalID: -133327340
+      spriteID: 331ce2af5a0a87a43a1b5bd5ce055bc7
+      internalID: 1261089785
       vertices: []
       indices: 
       edges: []
@@ -267,12 +285,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Tile 2: 693853673
-      Tile 3: 179664457
-      Tile 4: 1830541467
-      Tile 0: 2093186594
-      Tile 1: -2031541144
-      Tile 5: -133327340
+      Dead: 1261089785
+      Hit: -392852972
+      Run 0: 613658156
+      Run 1: -140220566
+      Run 2: 1611109861
+      Run 3: 1488126946
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

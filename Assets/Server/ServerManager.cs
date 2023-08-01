@@ -9,19 +9,11 @@ using BackEnd;
 
 public class ServerManager : MonoBehaviour
 {
-    // 유저의 정보를 이후의 scene에서도 쓸 수 있도록 인스턴스화
-    public static ServerManager instance;
-
     [Header ("# Login")]
     public InputField userID;
     public InputField userPW;
 
-    void Awake()
-    {
-        instance = this;
-    }
-
-    void Start()
+    public void Login()
     {
         var test = Backend.Initialize(true); // 뒤끝 초기화
 
@@ -34,10 +26,7 @@ public class ServerManager : MonoBehaviour
         {
             Debug.LogError("초기화 실패 : " + test); // 실패일 경우 statusCode 400대 에러 발생 
         }
-    }
 
-    public void Login()
-    {
         BackendLogin.Instance.CustomLogin(userID.text, userPW.text); 
     }
 }

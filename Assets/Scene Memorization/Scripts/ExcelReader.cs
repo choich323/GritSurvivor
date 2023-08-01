@@ -40,7 +40,7 @@ public class ExcelReader : MonoBehaviour
         int textFrontNum = int.Parse(textFront);
         int textBackNum = int.Parse(textBack);
 
-        // 암기 범위가 잘못된 경우 예외처리
+        // 암기 챕터의 범위가 잘못된 경우 예외처리
         if (textFrontNum > 200 || textFrontNum <= 0 || textBackNum > 200 || textBackNum <= 0 || textFrontNum > textBackNum)
         {
             MemorizationManager.instance.uiWarningText.SetActive(true);

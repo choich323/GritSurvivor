@@ -26,8 +26,11 @@ public class MemorizationManager : MonoBehaviour
     public Toggle toggleAnswerCheckAll;
 
     [Header("# Warning UI")]
+    // 확인창 Group
     public GameObject uiWarning;
+    // 페이지 이동시 확인창
     public GameObject uiPageMoveWarning;
+    // 챕터 선택 메뉴로 돌아갈 때 확인창
     public GameObject uiReturnSelectWarning;
 
     // 페이지 변동값 기록
@@ -39,8 +42,6 @@ public class MemorizationManager : MonoBehaviour
     {
         instance = this;
         excelReader = GetComponent<ExcelReader>();
-        // 유저의 아이디를 제대로 식별하는지 확인(임시 코드)
-        Debug.Log(ServerManager.instance.userID.text);
     }
 
     // 범위 선택 UI -> 암기 UI
@@ -52,7 +53,7 @@ public class MemorizationManager : MonoBehaviour
         btnReturnSelect.SetActive(true);
         scrollViewWordGroup.SetActive(true);
 
-        // 한 개 챕터만 선택하는 경우에 페이지 이동 불가
+        // 한 개 챕터만 선택하는 경우에 페이지 이동 불가능하게 설정
         if (ifFront.text == ifBack.text)
         {
             btnRight.SetActive(false);
@@ -61,6 +62,7 @@ public class MemorizationManager : MonoBehaviour
         {
             btnRight.SetActive(true);
         }
+        // 이전 페이지 버튼은 처음에 무조건 비활성화
         btnLeft.SetActive(false);
     }
 
@@ -78,6 +80,8 @@ public class MemorizationManager : MonoBehaviour
         scrollViewWordGroup.SetActive(false);
         uiWarning.SetActive(false);
         uiReturnSelectWarning.SetActive(false);
+        // 북마크 동기화
+        BookmarkUpdate();
     }
 
     // 메인 모드로 돌아가기
@@ -88,6 +92,9 @@ public class MemorizationManager : MonoBehaviour
 
     public void PageChange()
     {
+        // 북마크 동기화
+        BookmarkUpdate();
+
         int textFrontNum = int.Parse(ifFront.text);
 
         // 경고창 끄기
@@ -99,12 +106,13 @@ public class MemorizationManager : MonoBehaviour
         {
             excelReader.PageLoad(textFrontNum, ++add);
         }
+        // 왼쪽 버튼
         else
         {
             excelReader.PageLoad(textFrontNum, --add);
         }
 
-        // 첫 번호, 마지막 번호인 경우 버튼 on/off
+        // 첫 번호 or 마지막 번호인 경우 왼쪽/오른쪽 버튼 각각 on/off
         if (textFrontNum + add == int.Parse(ifBack.text))
         {
             btnRight.SetActive(false);
@@ -122,6 +130,26 @@ public class MemorizationManager : MonoBehaviour
         }
     }
 
+    // 북마크 업데이트 함수
+    public void BookmarkUpdate()
+    {
+        for (int index = 0; index < 30; index++)
+        {
+            bool isOn = excelReader.uiLines[index].GetChild(4).GetComponent<Toggle>().isOn;
+
+            // 토글을 통해 즐겨찾기에 추가
+            // 즐겨찾기 등록되어 있지 않았던 경우이므로 추가
+            if (isOn)
+            {
+                string word = excelReader.uiLines[index].GetChild(1).GetComponent<Text>().text;
+                string mean = excelReader.uiLines[index].GetChild(3).GetChild(2).GetComponent<Text>().text;
+                BackendGameData.Instance.BookmarkDataAdd(word, mean);
+            }
+        }
+        BackendGameData.Instance.BookmarkDataUpload("Day " + uiPageNumber.text);
+    }
+
+    // 모든 정답 공개하기 함수
     public void OpenAllAnswer(Toggle toggle)
     {
         foreach (RectTransform line in excelReader.uiLines)
@@ -131,17 +159,19 @@ public class MemorizationManager : MonoBehaviour
         }
     }
 
-    // N 번째 라인에 대하여 N의 값을 구하는 함수
+    // N 번째 라인에 대하여 N의 값을 구하는 함수; 0 <= N <= 29
     public void AnswerIndex(int index)
     {
         lineIndex = index;   
     }
 
-    public void OpenAnswer(Toggle toggle)
+    public void OpenAnswer()
     {
+        bool isOn = excelReader.uiLines[lineIndex].GetChild(3).GetComponent<Toggle>().isOn;
+
         // 인덱스를 통해 몇번째 라인인지 체크하고 해당 라인에 대해서만 변화를 적용
-        excelReader.uiLines[lineIndex].GetChild(3).GetChild(1).gameObject.SetActive(!toggle.isOn);
-        excelReader.uiLines[lineIndex].GetChild(3).GetChild(2).gameObject.SetActive(toggle.isOn);
+        excelReader.uiLines[lineIndex].GetChild(3).GetChild(1).gameObject.SetActive(!isOn);
+        excelReader.uiLines[lineIndex].GetChild(3).GetChild(2).gameObject.SetActive(isOn);
     }
 
     public void ShowWarning(bool isReturn)
@@ -157,7 +187,7 @@ public class MemorizationManager : MonoBehaviour
         }
     }
 
-    // 취소 버튼
+    // 페이지 이동 or 챕터 선택으로 돌아가기 취소 버튼
     public void Cancel(bool isReturn)
     {
         uiWarning.SetActive(false);
@@ -171,7 +201,8 @@ public class MemorizationManager : MonoBehaviour
         }
     }
 
-    // 페이지 이동시 다음 페이지인지 이전 페이지인지 구분하기 위한 인덱스를 로드
+    // 페이지 이동시 다음 페이지인지 이전 페이지인지, 즉 오른쪽 버튼을 눌렀는지 왼쪽 버튼을 눌렀는지 알려준다
+    // 이를 이용해서 페이지를 관리하는 인덱스의 값을 더하거나 빼준다.
      public void DirCheck(bool isRight)
     {
         this.isRight = isRight;
