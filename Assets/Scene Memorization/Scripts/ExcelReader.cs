@@ -82,11 +82,8 @@ public class ExcelReader : MonoBehaviour
 
             // 답이 공개되어 있는 경우 가리기
             Toggle toggleAnswerCheck = line.GetChild(3).GetComponent<Toggle>();
-            if (toggleAnswerCheck.isOn)
-            {
-                toggleAnswerCheck.isOn = false;
-            }
-
+            toggleAnswerCheck.isOn = false;
+            
             // 다음 단어로
             pageIndex++;
 
@@ -95,10 +92,7 @@ public class ExcelReader : MonoBehaviour
             inputData.text = "";
         }
         // 전체 답 공개 상태면 끄기
-        if (MemorizationManager.instance.toggleAnswerCheckAll.isOn)
-        {
-            MemorizationManager.instance.toggleAnswerCheckAll.isOn = false;
-        }
+        MemorizationManager.instance.toggleAnswerCheckAll.isOn = false;
 
         // 3. 페이지 넘버 갱신
         MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", (textFrontNum + add).ToString());
