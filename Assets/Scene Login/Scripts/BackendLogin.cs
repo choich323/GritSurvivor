@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // 뒤끝 SDK
 using BackEnd;
+
 
 public class BackendLogin
 {
@@ -38,7 +40,6 @@ public class BackendLogin
         else
         {
             Debug.LogError("로그인에 실패했습니다. : " + bro);
-            Debug.LogError("잘못된 사용자 아이디 혹은 비밀번호 입니다.");
         }
     }
 

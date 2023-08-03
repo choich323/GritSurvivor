@@ -53,6 +53,7 @@ public class BackendGameData {
         {
             Debug.Log("게임 정보 조회에 성공했습니다. : " + bro);
 
+            MemorizationManager.instance.isLoad = true;
             LitJson.JsonData gameDataJson = bro.FlattenRows(); // Json으로 리턴된 데이터를 받아옵니다.
 
             // 받아온 데이터의 갯수가 0이라면 데이터가 존재하지 않는 것입니다.

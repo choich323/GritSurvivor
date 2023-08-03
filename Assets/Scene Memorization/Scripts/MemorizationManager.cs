@@ -41,6 +41,7 @@ public class MemorizationManager : MonoBehaviour
 
     // 모드 확인용
     bool isBookmarkMode = false;
+    public bool isLoad = false;
 
     // 페이지 변동값 기록
     int add = 0;
@@ -84,7 +85,10 @@ public class MemorizationManager : MonoBehaviour
         isBookmarkMode = true;
 
         // 즐겨찾기 데이터 로드, UI에 적용
-        BookmarkLoad();
+        // 최초 1회만 데이터를 로드
+        if (!isLoad) { 
+            BookmarkLoad();
+        }
         BookmarkSync();
 
         // 선택창/경고 끄기, 선택창 돌아가기 버튼/스크롤뷰 켜기
