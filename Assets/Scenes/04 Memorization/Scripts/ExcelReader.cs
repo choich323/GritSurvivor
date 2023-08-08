@@ -7,6 +7,8 @@ public class ExcelReader : MonoBehaviour
 {
     int pageIndex = 0;
 
+    public bool isTestMode;
+
     // 행 데이터 저장할 프리펩 담기
     public RectTransform[] uiLines;
 
@@ -16,7 +18,10 @@ public class ExcelReader : MonoBehaviour
     void Awake()
     {
         // 초기화
-        data = CSVReader.Read("VOCA");
+        if (isTestMode)
+            data = CSVReader.Read("VOCA(test)");
+        else
+            data = CSVReader.Read("VOCA(memory)");
     }
 
     public void Init()
@@ -49,8 +54,9 @@ public class ExcelReader : MonoBehaviour
             return;
         }
 
-        // 페이지 넘버 초기화
-        MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", textFront);
+        if(!isTestMode)
+            // 페이지 넘버 초기화
+            MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", textFront);
 
         PageLoad(textFrontNum, 0);
 
@@ -61,34 +67,41 @@ public class ExcelReader : MonoBehaviour
     // 페이지 데이터 갱신
     public void PageLoad(int textFrontNum, int add)
     {
-        // 1. 단어 갱신
-        // 행 구분 인덱스: 선택한 챕터부터 시작
-        pageIndex = (textFrontNum + add - 1) * 30;
-        foreach (RectTransform line in uiLines)
+        if (!isTestMode)
         {
-            // 영단어 데이터 로드
-            Text word = line.GetChild(1).GetComponent<Text>();
-            word.text = data[pageIndex]["word"].ToString();
+            // 1. 단어 갱신
+            // 행 구분 인덱스: 선택한 챕터부터 시작
+            pageIndex = (textFrontNum + add - 1) * 30;
+            foreach (RectTransform line in uiLines)
+            {
+                // 영단어 데이터 로드
+                Text word = line.GetChild(1).GetComponent<Text>();
+                word.text = data[pageIndex]["word"].ToString();
 
-            // 단어 뜻 데이터 로드
-            Text textAnswer = line.GetChild(3).GetChild(2).GetComponent<Text>();
-            textAnswer.text = data[pageIndex]["mean"].ToString();
+                // 단어 뜻 데이터 로드
+                Text textAnswer = line.GetChild(3).GetChild(2).GetComponent<Text>();
+                textAnswer.text = data[pageIndex]["mean"].ToString();
 
-            // 답이 공개되어 있는 경우 가리기
-            Toggle toggleAnswerCheck = line.GetChild(3).GetComponent<Toggle>();
-            toggleAnswerCheck.isOn = false;
-            
-            // 다음 단어로
-            pageIndex++;
+                // 답이 공개되어 있는 경우 가리기
+                Toggle toggleAnswerCheck = line.GetChild(3).GetComponent<Toggle>();
+                toggleAnswerCheck.isOn = false;
 
-            // 2. 인풋 필드 초기화
-            InputField inputData = line.GetChild(2).GetComponent<InputField>();
-            inputData.text = "";
+                // 다음 단어로
+                pageIndex++;
+
+                // 2. 인풋 필드 초기화
+                InputField inputData = line.GetChild(2).GetComponent<InputField>();
+                inputData.text = "";
+            }
+            // 전체 답 공개 상태면 끄기
+            MemorizationManager.instance.toggleAnswerCheckAll.isOn = false;
+
+            // 3. 페이지 넘버 갱신
+            MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", (textFrontNum + add).ToString());
         }
-        // 전체 답 공개 상태면 끄기
-        MemorizationManager.instance.toggleAnswerCheckAll.isOn = false;
+        else
+        {
 
-        // 3. 페이지 넘버 갱신
-        MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", (textFrontNum + add).ToString());
+        }
     }
 }

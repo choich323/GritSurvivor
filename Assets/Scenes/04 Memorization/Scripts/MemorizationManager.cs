@@ -66,17 +66,20 @@ public class MemorizationManager : MonoBehaviour
         // 즐겨찾기 데이터 로드
         //BookmarkLoad();
 
-        // 한 개 챕터만 선택하는 경우에 페이지 이동 불가능하게 설정
-        if (ifFront.text == ifBack.text)
+        if (!excelReader.isTestMode)
         {
-            btnRight.SetActive(false);
+            // 한 개 챕터만 선택하는 경우에 페이지 이동 불가능하게 설정
+            if (ifFront.text == ifBack.text)
+            {
+                btnRight.SetActive(false);
+            }
+            else
+            {
+                btnRight.SetActive(true);
+            }
+            // 이전 페이지 버튼은 처음에 무조건 비활성화
+            btnLeft.SetActive(false);
         }
-        else
-        {
-            btnRight.SetActive(true);
-        }
-        // 이전 페이지 버튼은 처음에 무조건 비활성화
-        btnLeft.SetActive(false);
     }
 
     // 북마크 버튼을 터치했을 때 북마크 모드로 진입

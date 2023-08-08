@@ -15,6 +15,11 @@ public class ModeManager : MonoBehaviour
         SceneManager.LoadScene("04 Memorization");
     }
 
+    public void EnterTestMode()
+    {
+        SceneManager.LoadScene("06 Test");
+    }
+
     public void GameQuit()
     {
         Application.Quit();
