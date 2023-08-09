@@ -39,12 +39,13 @@ public class MemorizationManager : MonoBehaviour
     string[] bmMeans;
     int bmWordIndex = 0;
 
+    [Header("# Etc.")]
     // 모드 확인용
     bool isBookmarkMode = false;
     public bool isLoad = false;
 
     // 페이지 변동값 기록
-    int add = 0;
+    public int add = 0;
     int lineIndex = 0;
     bool isRight;
 
@@ -66,19 +67,16 @@ public class MemorizationManager : MonoBehaviour
         // 즐겨찾기 데이터 로드
         //BookmarkLoad();
 
-        if (!excelReader.isTestMode)
+        // 한 개 챕터만 선택하는 경우에 페이지 이동 불가능하게 설정
+        if (ifFront.text == ifBack.text)
         {
-            // 한 개 챕터만 선택하는 경우에 페이지 이동 불가능하게 설정
-            if (ifFront.text == ifBack.text)
-            {
-                btnRight.SetActive(false);
-            }
-            else
-            {
-                btnRight.SetActive(true);
-            }
-            // 이전 페이지 버튼은 처음에 무조건 비활성화
             btnLeft.SetActive(false);
+            btnRight.SetActive(false);
+        }
+        else
+        {
+            btnRight.SetActive(true);
+            btnLeft.SetActive(true);
         }
     }
 
@@ -99,18 +97,20 @@ public class MemorizationManager : MonoBehaviour
         uiWarningText.SetActive(false);
         btnReturnSelect.SetActive(true);
         scrollViewWordGroup.SetActive(true);
+        // 페이지 넘버 지우기
+        uiPageNumber.text = "";
 
         // 북마크에 저장된 단어의 갯수가 30개 이하인 경우 페이지 이동 불필요
         if (bmWords.Length <= 30)
         {
             btnRight.SetActive(false);
+            btnLeft.SetActive(false);
         }
         else
         {
             btnRight.SetActive(true);
+            btnLeft.SetActive(true);
         }
-        // 이전 페이지 버튼은 처음에 무조건 비활성화
-        btnLeft.SetActive(false);
     }
 
     // 암기 UI -> 범위 선택 UI
@@ -144,33 +144,23 @@ public class MemorizationManager : MonoBehaviour
     {
         // 경고창 끄기
         uiWarning.SetActive(false);
-        uiPageMoveWarning.SetActive(false);
+        if(!excelReader.isTestMode)
+            uiPageMoveWarning.SetActive(false);
 
         if (isBookmarkMode)
         {
             if (!isRight)
             {
                 bmWordIndex -= 31;
+                if(bmWordIndex < 0)
+                {
+                    // 첫 페이지에서 마지막 페이지로 가는 경우
+                    bmWordIndex = bmWords.Length - 1;
+                }
                 bmWordIndex -= bmWordIndex % 30;
             }
 
             BookmarkSync();
-
-            if (bmWordIndex <= 30)
-            {
-                btnLeft.SetActive(false);
-                btnRight.SetActive(true);
-            }
-            else if(bmWordIndex >= bmWords.Length)
-            {
-                btnRight.SetActive(false);
-                btnLeft.SetActive(true);
-            }
-            else
-            {
-                btnLeft.SetActive(true);
-                btnRight.SetActive(true);
-            }
         }
         else
         {
@@ -178,37 +168,21 @@ public class MemorizationManager : MonoBehaviour
             //BookmarkUpdate();
 
             int textFrontNum = int.Parse(ifFront.text);
+            int textBackNum = int.Parse(ifBack.text);
 
             // 오른쪽 버튼이면
             if (isRight)
             {
-                excelReader.PageLoad(textFrontNum, ++add);
+                excelReader.PageLoad(textFrontNum, textBackNum, ++add);
             }
             // 왼쪽 버튼
             else
             {
-                excelReader.PageLoad(textFrontNum, --add);
+                excelReader.PageLoad(textFrontNum, textBackNum, --add);
             }
 
             // 북마크 데이터 로드
             //BookmarkLoad();
-
-            // 첫 번호 or 마지막 번호인 경우 왼쪽/오른쪽 버튼 각각 on/off
-            if (textFrontNum + add == int.Parse(ifBack.text))
-            {
-                btnRight.SetActive(false);
-                btnLeft.SetActive(true);
-            }
-            else if (add < 1)
-            {
-                btnLeft.SetActive(false);
-                btnRight.SetActive(true);
-            }
-            else
-            {
-                btnLeft.SetActive(true);
-                btnRight.SetActive(true);
-            }
         }
     }
 
@@ -232,6 +206,7 @@ public class MemorizationManager : MonoBehaviour
             bmWordIndex = 0;
             BackendGameData.userData.words.Clear();
         }
+        // 구조 개편으로 인해 지금은 쓰지 않는 코드
         else
         {
             BackendGameData.Instance.BookmarkDataGet("Day " + uiPageNumber.text);
@@ -258,6 +233,11 @@ public class MemorizationManager : MonoBehaviour
     // 북마크 모드에서 북마크 데이터를 페이지 라인별 텍스트에 적용
     public void BookmarkSync()
     {
+        // 마지막 페이지에서 첫 페이지로 가는 경우
+        if (bmWordIndex == bmWords.Length)
+        {
+            bmWordIndex = 0;
+        }
         foreach (RectTransform line in excelReader.uiLines)
         {
             // 한 페이지에 표기할 단어가 30개보다 적어서 표기할 단어가 더 없는 경우 공백 표기

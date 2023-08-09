@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class ExcelReader : MonoBehaviour
 {
+    string[] answer;
     int pageIndex = 0;
 
     public bool isTestMode;
@@ -54,24 +55,37 @@ public class ExcelReader : MonoBehaviour
             return;
         }
 
-        if(!isTestMode)
-            // 페이지 넘버 초기화
-            MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", textFront);
-
-        PageLoad(textFrontNum, 0);
+        answer = new string[6001];
+        for (int i = 0; i < 6001; i++)
+            answer[i] = "";
+        PageLoad(textFrontNum, textBackNum, 0);
 
         // UI 전환
         MemorizationManager.instance.EnterMemorization();
     }
 
     // 페이지 데이터 갱신
-    public void PageLoad(int textFrontNum, int add)
+    public void PageLoad(int textFrontNum, int textBackNum, int add)
     {
+        // 단어 갱신
+        // 행 구분 인덱스: 선택한 챕터부터 시작
+        pageIndex = (textFrontNum + add - 1) * 30;
+
+        // 가장 뒷페이지로 이동
+        if (pageIndex < (textFrontNum - 1) * 30)
+        {
+            pageIndex = (textBackNum - 1) * 30;
+            MemorizationManager.instance.add = textBackNum - textFrontNum;
+        }
+        // 가장 앞페이지로 이동
+        else if (pageIndex >= textBackNum * 30)
+        {
+            pageIndex = (textFrontNum - 1) * 30;
+            MemorizationManager.instance.add = 0;
+        }
+
         if (!isTestMode)
         {
-            // 1. 단어 갱신
-            // 행 구분 인덱스: 선택한 챕터부터 시작
-            pageIndex = (textFrontNum + add - 1) * 30;
             foreach (RectTransform line in uiLines)
             {
                 // 영단어 데이터 로드
@@ -86,22 +100,37 @@ public class ExcelReader : MonoBehaviour
                 Toggle toggleAnswerCheck = line.GetChild(3).GetComponent<Toggle>();
                 toggleAnswerCheck.isOn = false;
 
-                // 다음 단어로
-                pageIndex++;
-
-                // 2. 인풋 필드 초기화
+                // 인풋 필드 초기화
                 InputField inputData = line.GetChild(2).GetComponent<InputField>();
                 inputData.text = "";
+
+                // 다음 단어로
+                pageIndex++;
             }
             // 전체 답 공개 상태면 끄기
             MemorizationManager.instance.toggleAnswerCheckAll.isOn = false;
 
-            // 3. 페이지 넘버 갱신
-            MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", (textFrontNum + add).ToString());
         }
         else
         {
+            foreach (RectTransform line in uiLines)
+            {
+                InputField inputData = line.GetChild(2).GetComponent<InputField>();
 
+                // 현재 데이터를 저장
+                if (pageIndex - 30 < 0)
+                    answer[(textBackNum - 1) * 30 + pageIndex] = inputData.text;
+                else
+                    answer[pageIndex - 30] = inputData.text;
+
+                // 새로운 데이터를 로드
+                inputData.text = answer[pageIndex];
+
+                // 다음 단어로
+                pageIndex++;
+            }
         }
+        // 페이지 넘버 갱신
+        MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", (textFrontNum + MemorizationManager.instance.add).ToString());
     }
 }
