@@ -5,9 +5,7 @@ using UnityEngine.UI;
 
 public class ExcelReader : MonoBehaviour
 {
-    string[] answer;
-    int pageIndex = 0;
-
+    // 테스트 모드 구분용
     public bool isTestMode;
 
     // 행 데이터 저장할 프리펩 담기
@@ -15,6 +13,13 @@ public class ExcelReader : MonoBehaviour
 
     // csv 데이터를 저장할 컨테이너
     List<Dictionary<string, object>> data;
+    // 랜덤으로 출제된 문제 데이터 저장
+    public Dictionary<float, string[]> randWords = new Dictionary<float, string[]>();
+    public List<float> keys = new List<float>();
+
+    // 유저의 입력을 저장할 배열
+    public string[] answer = new string[6001];
+    int pageIndex = 0;
 
     void Awake()
     {
@@ -55,9 +60,31 @@ public class ExcelReader : MonoBehaviour
             return;
         }
 
-        answer = new string[6001];
-        for (int i = 0; i < 6001; i++)
-            answer[i] = "";
+        if (isTestMode)
+        {
+            // 입력받았던 데이터 전부 초기화
+            for (int i = 0; i < 6001; i++)
+                answer[i] = "";
+
+            // 데이터 초기화
+            randWords.Clear();
+            keys.Clear();
+
+            for (int index = (textFrontNum - 1) * 30; index < textBackNum * 30; index++) {
+                // 단어 pair
+                string[] word = new string[2];
+                word[0] = data[index]["word"].ToString();
+                word[1] = data[index]["mean"].ToString();
+                // 단어의 키가 될 random 변수를 만들고 dictionary에 저장
+                float key = Random.value;
+                randWords[key] = word;
+                keys.Add(key);
+            }
+            // 키를 정렬하여 무작위로 배치
+            keys.Sort();
+        }
+
+        MemorizationManager.instance.uiTestRange.text = "(" + textFrontNum.ToString() + " ~ " + textBackNum.ToString() + ")";
         PageLoad(textFrontNum, textBackNum, 0);
 
         // UI 전환
@@ -113,8 +140,12 @@ public class ExcelReader : MonoBehaviour
         }
         else
         {
+            int keyIndex = pageIndex - (textFrontNum - 1) * 30;
             foreach (RectTransform line in uiLines)
             {
+                Text word = line.GetChild(1).GetComponent<Text>();
+                word.text = randWords[keys[keyIndex]][0];
+
                 InputField inputData = line.GetChild(2).GetComponent<InputField>();
 
                 // 현재 데이터를 저장
@@ -127,10 +158,10 @@ public class ExcelReader : MonoBehaviour
                 inputData.text = answer[pageIndex];
 
                 // 다음 단어로
-                pageIndex++;
+                pageIndex++; keyIndex++;
             }
         }
         // 페이지 넘버 갱신
-        MemorizationManager.instance.uiPageNumber.text = string.Format("{0}", (textFrontNum + MemorizationManager.instance.add).ToString());
+        MemorizationManager.instance.uiPageNumber.text = (textFrontNum + MemorizationManager.instance.add).ToString();
     }
 }

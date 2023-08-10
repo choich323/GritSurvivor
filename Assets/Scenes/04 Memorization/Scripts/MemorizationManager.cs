@@ -23,6 +23,7 @@ public class MemorizationManager : MonoBehaviour
     public GameObject btnLeft;
     public GameObject btnRight;
     public Text uiPageNumber;
+    public Text uiTestRange;
     public Toggle toggleAnswerCheckAll;
 
     // 페이지 전환시 경고 UI
@@ -52,6 +53,7 @@ public class MemorizationManager : MonoBehaviour
     void Awake()
     {
         instance = this;
+        Application.targetFrameRate = 60;
         excelReader = GetComponent<ExcelReader>();
     }
 
