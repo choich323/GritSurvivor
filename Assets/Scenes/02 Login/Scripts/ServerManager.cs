@@ -15,6 +15,8 @@ public class ServerManager : MonoBehaviour
     // 로그인 실패 문자
     public GameObject loginFail;
 
+    WaitForSeconds wait = new WaitForSeconds(2f);
+
     bool isInit = false;
 
     public void Login()
@@ -35,6 +37,17 @@ public class ServerManager : MonoBehaviour
                 Debug.LogError("초기화 실패 : " + test); // 실패일 경우 statusCode 400대 에러 발생
             }
         }
-        BackendLogin.Instance.CustomLogin(userID.text, userPW.text, loginFail); 
+        // 로그인 에러 끄는 코루틴 중이었으면 종료
+        StopCoroutine("OffError");
+        BackendLogin.Instance.CustomLogin(userID.text, userPW.text, loginFail);
+        // 로그인 오류 메세지 끄기
+        StartCoroutine("OffError");
+    }
+
+    IEnumerator OffError()
+    {
+        yield return wait;
+
+        loginFail.SetActive(false);
     }
 }

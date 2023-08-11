@@ -14,7 +14,7 @@ public class MemorizationManager : MonoBehaviour
     [Header("# Select UI")]
     public GameObject scrollViewWordGroup;
     public GameObject uiSelect;
-    public GameObject uiWarningText;
+    public GameObject uiRangeError;
     public InputField ifFront;
     public InputField ifBack;
 
@@ -62,7 +62,7 @@ public class MemorizationManager : MonoBehaviour
     {
         // 선택창/경고 끄기, 선택창 돌아가기 버튼/스크롤뷰 켜기
         uiSelect.SetActive(false);
-        uiWarningText.SetActive(false);
+        uiRangeError.SetActive(false);
         btnReturnSelect.SetActive(true);
         scrollViewWordGroup.SetActive(true);
 
@@ -96,7 +96,7 @@ public class MemorizationManager : MonoBehaviour
 
         // 선택창/경고 끄기, 선택창 돌아가기 버튼/스크롤뷰 켜기
         uiSelect.SetActive(false);
-        uiWarningText.SetActive(false);
+        uiRangeError.SetActive(false);
         btnReturnSelect.SetActive(true);
         scrollViewWordGroup.SetActive(true);
         // 페이지 넘버 지우기
@@ -175,12 +175,12 @@ public class MemorizationManager : MonoBehaviour
             // 오른쪽 버튼이면
             if (isRight)
             {
-                excelReader.PageLoad(textFrontNum, textBackNum, ++add);
+                excelReader.PageLoad(textFrontNum, textBackNum, ++add, false);
             }
             // 왼쪽 버튼
             else
             {
-                excelReader.PageLoad(textFrontNum, textBackNum, --add);
+                excelReader.PageLoad(textFrontNum, textBackNum, --add, false);
             }
 
             // 북마크 데이터 로드

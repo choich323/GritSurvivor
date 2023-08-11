@@ -21,6 +21,6 @@ EditorBuildSettings:
     path: Assets/Scenes/04 Memorization.unity
     guid: be297591f63682e41afa8e3e08619686
   - enabled: 1
-    path: Assets/Scenes/06.unity
-    guid: 696bc093de5b2ba439216198044b1204
+    path: Assets/Scenes/06 Test.unity
+    guid: f4eab87a804761f4d97da0a17e08f907
   m_configObjects: {}

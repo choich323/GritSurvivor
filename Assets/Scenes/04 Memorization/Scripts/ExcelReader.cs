@@ -21,6 +21,8 @@ public class ExcelReader : MonoBehaviour
     public string[] answer = new string[6001];
     int pageIndex = 0;
 
+    WaitForSeconds wait;
+
     void Awake()
     {
         // 초기화
@@ -28,10 +30,14 @@ public class ExcelReader : MonoBehaviour
             data = CSVReader.Read("VOCA(test)");
         else
             data = CSVReader.Read("VOCA(memory)");
+        wait = new WaitForSeconds(2f);
     }
 
     public void Init()
     {
+        // 에러 끄기 코루틴을 실행 중이었다면 우선 종료
+        StopCoroutine("OffError");
+
         // 단어 암기 챕터 범위(텍스트)
         string textFront = MemorizationManager.instance.ifFront.text;
         string textBack = MemorizationManager.instance.ifBack.text;
@@ -39,7 +45,9 @@ public class ExcelReader : MonoBehaviour
         // 시작 챕터가 빈칸인 경우 예외처리
         if (textFront == "")
         {
-            MemorizationManager.instance.uiWarningText.SetActive(true);
+            MemorizationManager.instance.uiRangeError.SetActive(true);
+            // 2초 후 알림 끔
+            StartCoroutine("OffError");
             return;
         }
         // 끝 챕터가 빈칸인 경우 자동으로 200으로 설정
@@ -56,7 +64,9 @@ public class ExcelReader : MonoBehaviour
         // 암기 챕터의 범위가 잘못된 경우 예외처리
         if (textFrontNum > 200 || textFrontNum <= 0 || textBackNum > 200 || textBackNum <= 0 || textFrontNum > textBackNum)
         {
-            MemorizationManager.instance.uiWarningText.SetActive(true);
+            MemorizationManager.instance.uiRangeError.SetActive(true);
+            // 2초 후 알림 끔
+            StartCoroutine("OffError");
             return;
         }
 
@@ -83,16 +93,24 @@ public class ExcelReader : MonoBehaviour
             // 키를 정렬하여 무작위로 배치
             keys.Sort();
         }
-
+        // 암기/시험 범위 텍스트
         MemorizationManager.instance.uiTestRange.text = "(" + textFrontNum.ToString() + " ~ " + textBackNum.ToString() + ")";
-        PageLoad(textFrontNum, textBackNum, 0);
+        PageLoad(textFrontNum, textBackNum, 0, true);
 
         // UI 전환
         MemorizationManager.instance.EnterMemorization();
     }
 
+    // 범위 오류시 텍스트 끄는 코루틴
+    IEnumerator OffError()
+    {
+        yield return wait;
+
+        MemorizationManager.instance.uiRangeError.SetActive(false);
+    }
+
     // 페이지 데이터 갱신
-    public void PageLoad(int textFrontNum, int textBackNum, int add)
+    public void PageLoad(int textFrontNum, int textBackNum, int add, bool isInit)
     {
         // 단어 갱신
         // 행 구분 인덱스: 선택한 챕터부터 시작
@@ -148,15 +166,17 @@ public class ExcelReader : MonoBehaviour
 
                 InputField inputData = line.GetChild(2).GetComponent<InputField>();
 
-                // 현재 데이터를 저장
-                if (pageIndex - 30 < 0)
-                    answer[(textBackNum - 1) * 30 + pageIndex] = inputData.text;
-                else
-                    answer[pageIndex - 30] = inputData.text;
-
+                if (!isInit)
+                {
+                    // 현재 데이터를 저장
+                    if (pageIndex - 30 < 0)
+                        answer[(textBackNum - 1) * 30 + pageIndex] = inputData.text;
+                    else
+                        answer[pageIndex - 30] = inputData.text;
+                }
                 // 새로운 데이터를 로드
                 inputData.text = answer[pageIndex];
-
+                
                 // 다음 단어로
                 pageIndex++; keyIndex++;
             }
