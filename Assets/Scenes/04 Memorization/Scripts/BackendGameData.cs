@@ -149,8 +149,7 @@ public class BackendGameData {
         {
             userData = new UserData();
         }
-
-        userData.words.Add(word, mean);
+        userData.words[word] = mean;
     }
 
     // DB에 동기화

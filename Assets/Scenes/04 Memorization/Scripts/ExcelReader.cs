@@ -82,10 +82,11 @@ public class ExcelReader : MonoBehaviour
 
             for (int index = (textFrontNum - 1) * 30; index < textBackNum * 30; index++) {
                 // 단어 pair
-                string[] word = new string[2];
+                string[] word = new string[3];
                 word[0] = data[index]["word"].ToString();
                 word[1] = data[index]["mean"].ToString();
-                // 단어의 키가 될 random 변수를 만들고 dictionary에 저장
+                word[2] = data[index]["origin"].ToString();
+                // 단어의 키가 될 random 변수를 만들고, 이를 통해 단어를 dictionary에 저장
                 float key = Random.value;
                 randWords[key] = word;
                 keys.Add(key);

@@ -8,8 +8,10 @@ using BackEnd;
 
 public class TestManager : MonoBehaviour
 {
+    public RectTransform[] uiTestData;
     public GameObject uiSubmitCheck;
     public GameObject uiScoreResult;
+    public GameObject uiTestDataBackground;
     ExcelReader excelReader;
 
     // 시험 점수
@@ -53,8 +55,6 @@ public class TestManager : MonoBehaviour
         float max = (textBackNum - textFrontNum + 1) * 30;
         // 정답수
         float correct = 0;
-        // 오답 기록용 리스트
-        List<string[]> wrong = new List<string[]>();
 
         // 현재 페이지 데이터 저장
         int pageIndex = (int.Parse(MemorizationManager.instance.uiPageNumber.text) - 1) * 30;
@@ -95,8 +95,7 @@ public class TestManager : MonoBehaviour
             if (right) correct++;
             else
             {
-                // 오답은 따로 저장
-                wrong.Add(excelReader.randWords[excelReader.keys[keyIndex]]);
+                BackendGameData.Instance.BookmarkDataAdd(excelReader.randWords[excelReader.keys[keyIndex]][0], excelReader.randWords[excelReader.keys[keyIndex]][2]);
             }
             keyIndex++;
         }
@@ -108,23 +107,23 @@ public class TestManager : MonoBehaviour
         // 현재 시간
         string testLog = DateTime.Now.ToString() + "\n" + MemorizationManager.instance.ifFront.text + "~" + MemorizationManager.instance.ifBack.text + "_" + correct.ToString() + "/" + max.ToString() + "_" + score.ToString() + "점";
         // 세이브 슬롯 넘버
-        int slotNum = PlayerPrefs.GetInt("lastTest");
+        int slotNum = (PlayerPrefs.GetInt("lastTest") + 1) % 10;       
         // 지정 슬롯에 테스트 기록 저장
         PlayerPrefs.SetString("testSlot" + slotNum.ToString(), testLog);
-        slotNum++;
-        if (slotNum > 9)
-            slotNum = 0;
-        // 슬롯 넘버 증가시켜서 저장
+
         PlayerPrefs.SetInt("lastTest", slotNum);
 
-        // 오답 북마크에 기록
-
-
-        // 합격 여부에 따라 서버에 로그 기록
-        if (score >= 90f)
+        if(score >= 60f)
         {
-            InsertLog(testLog);
+            // 오답 북마크에 기록
+            BackendGameData.Instance.BookmarkDataUpload("Last Test");
+            // 합격 여부에 따라 서버에 로그 기록
+            if (score >= 90f)
+            {
+                InsertLog(testLog);
+            }
         }
+        BackendGameData.userData.words.Clear();
 
         // 제출확인 창을 끄고 점수 확인란을 켜기
         uiSubmitCheck.SetActive(false);
@@ -159,5 +158,30 @@ public class TestManager : MonoBehaviour
         }
 
         Debug.Log("로그 삽입에 성공했습니다. : " + bro);
+    }
+
+    // Check test data from local storage
+    public void TestDataToggle(Toggle testData)
+    {
+        uiTestDataBackground.SetActive(testData.isOn);
+        if(testData.isOn == true)
+        {
+            TestDataLoad();
+        }
+    }
+
+    public void TestDataLoad()
+    {
+        int slotNum = PlayerPrefs.GetInt("lastTest");
+        foreach(RectTransform testData in uiTestData)
+        {
+            Text data = testData.GetChild(0).GetComponent<Text>();
+            data.text = PlayerPrefs.GetString("testSlot" + slotNum.ToString());
+            slotNum--;
+            if(slotNum < 0)
+            {
+                slotNum = 9;
+            }
+        }
     }
 }
