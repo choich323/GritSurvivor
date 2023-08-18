@@ -14,7 +14,7 @@ public class TestManager : MonoBehaviour
     public GameObject uiTestDataBackground;
     ExcelReader excelReader;
 
-    // 시험 점수
+    // test score
     float score;
 
     void Awake()
@@ -26,7 +26,7 @@ public class TestManager : MonoBehaviour
         }
     }
 
-    // 로컬 저장 데이터 초기화
+    // Initialize locally stored data
     public void Init()
     {
         PlayerPrefs.SetInt("lastTest", 0);
@@ -51,12 +51,12 @@ public class TestManager : MonoBehaviour
         int textFrontNum = int.Parse(MemorizationManager.instance.ifFront.text);
         int textBackNum = int.Parse(MemorizationManager.instance.ifBack.text);
         int keyIndex = 0;
-        // 문제수
+        // The total number of questions
         float max = (textBackNum - textFrontNum + 1) * 30;
-        // 정답수
+        // The number of correct answers
         float correct = 0;
 
-        // 현재 페이지 데이터 저장
+        // Save the current page data
         int pageIndex = (int.Parse(MemorizationManager.instance.uiPageNumber.text) - 1) * 30;
         foreach(RectTransform line in excelReader.uiLines)
         {
@@ -64,19 +64,19 @@ public class TestManager : MonoBehaviour
             excelReader.answer[pageIndex] = inputData.text;
             pageIndex++;
         }
-        // 채점
+        // Scoring
         for(int index = (textFrontNum - 1) * 30; index < textBackNum * 30; index++)
         {
-            // 뜻
+            // Meaning data
             string means = excelReader.randWords[excelReader.keys[keyIndex]][1];
             bool right = false;
-            // 뜻이 여러 개인 경우
-            foreach(string mean in means.Split('.'))
+            // When multiple meanings
+            foreach (string mean in means.Split('.'))
             {
-                // 유저가 작성한 뜻이 여러 개인 경우
+                // When user inputs multiple answers
                 foreach (string ans in excelReader.answer[index].Split(','))
                 {
-                    // 띄어쓰기 있는 경우 무시
+                    // Ignore spaces
                     string tmp = "";
                     foreach(char spell in ans)
                     {
@@ -91,33 +91,33 @@ public class TestManager : MonoBehaviour
                 }
                 if (right) break;
             }
-            // 정답이면
             if (right) correct++;
             else
             {
+                // save incorrect answers
                 BackendGameData.Instance.BookmarkDataAdd(excelReader.randWords[excelReader.keys[keyIndex]][0], excelReader.randWords[excelReader.keys[keyIndex]][2]);
             }
             keyIndex++;
         }
 
-        // 점수 계산: 소수점 2번째 자리까지
+        // Scoring: up to the second decimal place
         score = Mathf.Round(((float)correct / max) * 10000f) / 100f;
 
-        // 로컬에 저장
-        // 현재 시간
+        // Save at local
+        // current time
         string testLog = DateTime.Now.ToString() + "\n" + MemorizationManager.instance.ifFront.text + "~" + MemorizationManager.instance.ifBack.text + "_" + correct.ToString() + "/" + max.ToString() + "_" + score.ToString() + "점";
-        // 세이브 슬롯 넘버
+        // save slot number
         int slotNum = (PlayerPrefs.GetInt("lastTest") + 1) % 10;       
-        // 지정 슬롯에 테스트 기록 저장
+        // save test history at slot
         PlayerPrefs.SetString("testSlot" + slotNum.ToString(), testLog);
 
         PlayerPrefs.SetInt("lastTest", slotNum);
 
         if(score >= 60f)
         {
-            // 오답 북마크에 기록
+            // Save incorrect answers to DB
             BackendGameData.Instance.BookmarkDataUpload("Last Test");
-            // 합격 여부에 따라 서버에 로그 기록
+            // Save log to server based on test result
             if (score >= 90f)
             {
                 InsertLog(testLog);
@@ -125,39 +125,39 @@ public class TestManager : MonoBehaviour
         }
         BackendGameData.userData.words.Clear();
 
-        // 제출확인 창을 끄고 점수 확인란을 켜기
+        // Turn off the submission UI and turn on the score verification UI
         uiSubmitCheck.SetActive(false);
         uiScoreResult.SetActive(true);
         Text scoreResult = uiScoreResult.GetComponent<RectTransform>().GetChild(0).GetComponent<Text>();
-        // 소수점 둘째자리까지 확인
+        // Test result
         scoreResult.text = "시험 결과: " + correct + " / " + max + string.Format("\n백분율: {0:F2}", score);
     }
 
-    // 시험 결과 확인후 시험 종료하고 범위 선택화면으로 돌아가는 함수
+    // After checking the test results, finish the test and return to the range selection UI
     public void ExitTest()
     {
         uiScoreResult.SetActive(false);
         MemorizationManager.instance.ReturnSelect();
     }
 
-    // 시험 데이터를 로그로 저장하는 함수
+    // Save test data log
     public void InsertLog(string testLog)
     {
-        Debug.Log("로그 삽입을 시도합니다.");
+        Debug.Log("Insert Log");
 
         Param param = new Param();
         param.Add("시험 날짜/시험 범위_시험 결과_시험 점수", testLog);
 
-        // 닉네임과 테스트 기록, 기록 유효기간
+        // user nickname, test history, history expiration date
         var bro = Backend.GameLog.InsertLog("TestPass", param, 10);
 
         if (bro.IsSuccess() == false)
         {
-            Debug.LogError("로그 삽입 중 에러가 발생했습니다. : " + bro);
+            Debug.LogError("Insert Error : " + bro);
             return;
         }
 
-        Debug.Log("로그 삽입에 성공했습니다. : " + bro);
+        Debug.Log("Insert Success : " + bro);
     }
 
     // Check test data from local storage

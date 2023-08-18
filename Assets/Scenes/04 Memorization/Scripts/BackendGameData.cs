@@ -3,24 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using BackEnd;
-using System.Text;
 
 public class UserData
 {
     public Dictionary<string, string> words = new Dictionary<string, string>();
-
-    // Get함수에서 데이터를 디버깅하기 위한 함수.
-    public override string ToString()
-    {
-        StringBuilder result = new StringBuilder();
-
-        foreach (var itemKey in words.Keys)
-        {
-            result.AppendLine($"{itemKey} : {words[itemKey]}");
-        }
-
-        return result.ToString();
-    }
 }
 
 public class BackendGameData {
@@ -44,26 +30,26 @@ public class BackendGameData {
 
     private string gameDataRowInDate = string.Empty;
 
-    // 최근 테스트에서 오답이었던 단어 모음을 로드
+    // Load words that were incorrect in the last test
     public void BookmarkDataGet()
     {
-        Debug.Log("게임 정보 조회 함수를 호출합니다.");
+        Debug.Log("Request Game Data Load");
         var bro = Backend.GameData.GetMyData("BOOKMARK", new Where());
         if (bro.IsSuccess())
         {
-            Debug.Log("게임 정보 조회에 성공했습니다. : " + bro);
+            Debug.Log("Game Data Load Success : " + bro);
 
             MemorizationManager.instance.isLoad = true;
-            LitJson.JsonData gameDataJson = bro.FlattenRows(); // Json으로 리턴된 데이터를 받아옵니다.
+            LitJson.JsonData gameDataJson = bro.FlattenRows(); // Get Data by Json
 
-            // 받아온 데이터의 갯수가 0이라면 데이터가 존재하지 않는 것입니다.
+            // If the number of data received is zero, the data does not exist.
             if (gameDataJson.Count <= 0)
             {
-                Debug.LogWarning("데이터가 존재하지 않습니다.");
+                Debug.LogWarning("There's no data");
             }
             else
             {
-                gameDataRowInDate = gameDataJson[0]["inDate"].ToString(); //불러온 게임정보의 고유값입니다.
+                gameDataRowInDate = gameDataJson[0]["inDate"].ToString(); // Unique value of game data
 
                 if (userData == null)
                 {
@@ -71,17 +57,17 @@ public class BackendGameData {
                 }
                 else
                 {
-                    // 이미 데이터가 있는 경우 컨테이너 비우기
+                    // Empty containers if data already exists
                     userData.words.Clear();
                 }
 
                 if (!gameDataJson[0].ContainsKey("Last Test"))
                 {
-                    Debug.Log("Column 데이터가 존재하지 않습니다.");
+                    Debug.Log("Column data has not exist.");
                     return;
                 }
 
-                // 단어 데이터 담기
+                // Put word data
                 foreach (string itemKey in gameDataJson[0]["Last Test"].Keys)
                 {
                     userData.words.Add(itemKey, gameDataJson[0]["Last Test"][itemKey].ToString());
@@ -90,59 +76,11 @@ public class BackendGameData {
         }
         else
         {
-            Debug.LogError("게임 정보 조회에 실패했습니다. : " + bro);
+            Debug.LogError("Game Data Load Failed : " + bro);
         }
     }
 
-    public void BookmarkDataGet(string day)
-    {
-        Debug.Log("게임 정보 조회 함수를 호출합니다.");
-        var bro = Backend.GameData.GetMyData("BOOKMARK", new Where());
-        if (bro.IsSuccess())
-        {
-            Debug.Log("게임 정보 조회에 성공했습니다. : " + bro);
-
-            LitJson.JsonData gameDataJson = bro.FlattenRows(); // Json으로 리턴된 데이터를 받아옵니다.
-
-            // 받아온 데이터의 갯수가 0이라면 데이터가 존재하지 않는 것입니다.
-            if (gameDataJson.Count <= 0)
-            {
-                Debug.LogWarning("데이터가 존재하지 않습니다.");
-            }
-            else
-            {
-                gameDataRowInDate = gameDataJson[0]["inDate"].ToString(); //불러온 게임정보의 고유값입니다.
-
-                if (userData == null)
-                {
-                    userData = new UserData();
-                }
-                else
-                {
-                    // 이미 데이터가 있는 경우 컨테이너 비우기
-                    userData.words.Clear();
-                }
-
-                if (!gameDataJson[0].ContainsKey(day))
-                {
-                    Debug.Log("Column 데이터가 존재하지 않습니다.");
-                    return;
-                }
-
-                // 단어 데이터 담기
-                foreach (string itemKey in gameDataJson[0][day].Keys)
-                {
-                    userData.words.Add(itemKey, gameDataJson[0][day][itemKey].ToString());
-                }
-            }
-        }
-        else
-        {
-            Debug.LogError("게임 정보 조회에 실패했습니다. : " + bro);
-        }
-    }
-
-    // 유저 데이터에 단어 추가
+    // Add word to UserData
     public void BookmarkDataAdd(string word, string mean)
     {
         if (userData == null)
@@ -152,7 +90,7 @@ public class BackendGameData {
         userData.words[word] = mean;
     }
 
-    // DB에 동기화
+    // Synchronization to DB
     public void BookmarkDataUpload(string column)
     {
         if (userData == null)
@@ -167,27 +105,27 @@ public class BackendGameData {
 
         if (string.IsNullOrEmpty(gameDataRowInDate))
         {
-            Debug.Log("내 제일 최신 게임정보 데이터 수정을 요청합니다.");
+            Debug.Log("Request modification of the latest game data");
 
             bro = Backend.GameData.Update("BOOKMARK", new Where(), param);
         }
         else
         {
-            Debug.Log($"{gameDataRowInDate}의 게임정보 데이터 수정을 요청합니다.");
+            Debug.Log($" Request modification of {gameDataRowInDate} data");
 
             bro = Backend.GameData.UpdateV2("BOOKMARK", gameDataRowInDate, Backend.UserInDate, param);
         }
 
         if (bro.IsSuccess())
         {
-            Debug.Log("게임정보 데이터 수정에 성공했습니다. : " + bro);
+            Debug.Log("modification Success : " + bro);
         }
         else
         {
-            Debug.LogError("게임정보 데이터 수정에 실패했습니다. : " + bro);
+            Debug.LogError("modification fail : " + bro);
         }
 
-        // 파라미터에 추가한 뒤 유저 데이터는 초기화
+        // Empty user data after adding to parameters
         userData.words.Clear();
     }
 }

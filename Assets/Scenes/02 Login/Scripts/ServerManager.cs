@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-// 뒤끝 SDK
+// Backend Server SDK
 using BackEnd;
 
 public class ServerManager : MonoBehaviour
@@ -12,7 +12,7 @@ public class ServerManager : MonoBehaviour
     public InputField userID;
     public InputField userPW;
 
-    // 로그인 실패 문자
+    // Login Fail UI
     public GameObject loginFail;
 
     WaitForSeconds wait = new WaitForSeconds(2f);
@@ -21,26 +21,26 @@ public class ServerManager : MonoBehaviour
 
     public void Login()
     {
-        // 초기화가 성공할 때까지만 실행
+        //  Run until initialization is successful
         if (!isInit)
         {
-            var test = Backend.Initialize(true); // 뒤끝 초기화
+            var test = Backend.Initialize(true);
 
-            // 뒤끝 초기화에 대한 응답값
+            // Response value for initialization
             if (test.IsSuccess())
             {
-                Debug.Log("초기화 성공 : " + test); // 성공일 경우 statusCode 204 Success
+                Debug.Log("Initialization success : " + test); // statusCode 204 when Success
                 isInit = true;
             }
             else
             {
-                Debug.LogError("초기화 실패 : " + test); // 실패일 경우 statusCode 400대 에러 발생
+                Debug.LogError("Initialization Failure : " + test); // statusCode 400 series error when Failure
             }
         }
-        // 로그인 에러 끄는 코루틴 중이었으면 종료
+
         StopCoroutine("OffError");
         BackendLogin.Instance.CustomLogin(userID.text, userPW.text, loginFail);
-        // 로그인 오류 메세지 끄기
+        // Turn off login error message
         StartCoroutine("OffError");
     }
 
