@@ -4,15 +4,13 @@ using UnityEditor;
 using UnityEngine;
 using UnityEditor.Build.Reporting;
 
-// Output the build size or a failure depending on BuildPlayer.
-
-public class BuildPlayer : MonoBehaviour
+public class BuildPlayer
 {
     [MenuItem("Build/Build AOS")]
     public static void MyBuild_AOS()
     {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
-        buildPlayerOptions.scenes = new[] { "Assets/01 Access.unity", "Assets/02 Login.unity", "Assets/03 MainMenu.unity", "Assets/04 Memorization", "Assets/05 UndeadSurvivor", "Assets/06 Test"};
+        buildPlayerOptions.scenes = FindEnabledEditorScenes();
         buildPlayerOptions.locationPathName = $"Builds/AOS_{PlayerSettings.bundleVersion}.apk";
         buildPlayerOptions.target = BuildTarget.Android;
         buildPlayerOptions.options = BuildOptions.None;
@@ -29,5 +27,18 @@ public class BuildPlayer : MonoBehaviour
         {
             Debug.Log("Build failed");
         }
+    }
+
+    private static string[] FindEnabledEditorScenes()
+    {
+        List<string> EditorScenes = new List<string>();
+
+        foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
+        {
+            if (!scene.enabled) continue;
+            EditorScenes.Add(scene.path);
+        }
+
+        return EditorScenes.ToArray();
     }
 }
